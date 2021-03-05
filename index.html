@@ -46,16 +46,22 @@ function preload ()
 
 function create ()
 {
+    var winWidth=window.innerWidth;
+    var winHeight=window.innerHeight;
+
+    var scaleFactor = innerHeight/(234*4);
+    console.log(scaleFactor);
+
     this.input.addPointer(5);
     var clickTarget;
 
     for(i = 0; i < 20; i++)
     {
-        lastCreated=createCircle(this,Math.random() *1000,Math.random() *600);
+        lastCreated=createCircle(this,Math.random() *1000,Math.random() *600,scaleFactor);
     }
 
     var colorExample = this.add.image(60,60,'green');
-    colorExample.setScale(.5);
+    colorExample.setScale(.5*scaleFactor);
     colorExample.setTintFill(lastCreated.randomColor);
     colorExample.setInteractive().on('pointerdown', function(pointer, gameObject, event) {
         if (this.scene.scale.isFullscreen) {
@@ -99,12 +105,14 @@ function create ()
 
 }
 
-function createCircle(thizz,posX,posY){
+function createCircle(thizz,posX,posY,scaleFactor){
     var s1 = thizz.physics.add.group();
     var e1 = s1.create(posX,posY,'green');
+    e1.setScale(scaleFactor);
     var randomColor = getRandomColor();
     e1.setTintFill(randomColor);
     var face1 = thizz.physics.add.sprite(posX,posY,'mouth');
+    face1.setScale(scaleFactor);
     face1.setInteractive().on('pointerdown', function (pointer, localX, localY, event) {
         // gameObject.setTintFill(0xffff00, 0xffff00, 0xff0000, 0xff0000);¨
         console.log("click");
