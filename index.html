@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.16.1/dist/phaser-arcade-physics.min.js"></script>
+<style>
+    body, html {
+        height: 98%;
+        width:98%;
+    }
+</style>
+
+</head>
+<body>
+
+    <script>
+    var config = {
+    type: Phaser.AUTO,
+    scale: {
+        mode: Phaser.Scale.RESIZE,
+        parent: 'game',
+        autoCenter: Phaser.Scale.CENTER_BOTH
+    },
+    backgroundColor: '#efefef',
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 100 },
+            debug: false
+        }
+    },
+    scene: {
+        preload: preload,
+        create: create,
+        update: update
+    }
+};
+
+var game = new Phaser.Game(config);
+
+function preload ()
+{
+    this.load.setPath('assets');
+    this.load.image('green',"green.png");
+    this.load.spritesheet('mouth',"mouth.png",{ frameWidth: 234, frameHeight: 234 });
+}
+
+function create ()
+{
+    this.input.addPointer(5);
+    var clickTarget;
+
+    for(i = 0; i < 20; i++)
+    {
+        lastCreated=createCircle(this,Math.random() *1000,Math.random() *600);
+    }
+
+    var colorExample = this.add.image(60,60,'green');
+    colorExample.setScale(.5);
+    colorExample.setTintFill(lastCreated.randomColor);
+    colorExample.setInteractive().on('pointerdown', function(pointer, gameObject, event) {
+        if (this.scene.scale.isFullscreen) {
+            this.scene.scale.stopFullscreen();
+            // On stop fulll screen
+        } else {
+            this.scene.scale.startFullscreen();
+            // On start fulll screen
+        }
+        event.stopPropagation();
+    });
+
+    //gameObject.setInteractive();
+    //scene.input.setDraggable(gameObject);
+    //scene.input.setDraggable(gameObject, false);
+    //
+    //gameObject.setInteractive({ dropZone: true });
+    //scene.input.on('dragover', function(pointer, gameObject, target){ /* ... */ });
+
+    this.anims.create({
+        key: 'nothing',
+        frames: [ { key: 'mouth', frame: 0 } ],
+        frameRate: 20
+    });
+
+    this.anims.create({
+        key: 'smile',
+        frames: [ { key: 'mouth', frame: 1 } ],
+        frameRate: 20
+    });
+
+    this.anims.create({
+        key: 'sad',
+        frames: [ { key: 'mouth', frame: 2 } ],
+        frameRate: 20
+    });
+
+    //var p = this.physics.add.image(0, 0, 'green').setInteractive();
+    //p.setBounce(0.8);
+    //p.setCollideWorldBounds(true);
+
+}
+
+function createCircle(thizz,posX,posY){
+    var s1 = thizz.physics.add.group();
+    var e1 = s1.create(posX,posY,'green');
+    var randomColor = getRandomColor();
+    e1.setTintFill(randomColor);
+    var face1 = thizz.physics.add.sprite(posX,posY,'mouth');
+    face1.setInteractive().on('pointerdown', function (pointer, localX, localY, event) {
+        // gameObject.setTintFill(0xffff00, 0xffff00, 0xff0000, 0xff0000);¨
+        console.log("click");
+        if(lastCreated.clickTarget==this){
+            this.anims.play('smile');
+            this.scene.scene.pause();
+            setTimeout(() => {
+                this.scene.scene.restart();
+            },2000);
+        }else{
+            this.anims.play('sad');
+        }
+
+        }).on('pointerup', function (pointer, localX, localY, event) {
+
+            this.anims.play('nothing');
+            //gameObject.clearTint();
+
+        });
+    s1.add(face1);
+    s1.children.iterate(function (child) {
+        child.setBounce(1);
+        child.setCollideWorldBounds(true);
+    });
+    var created = {};
+    created.clickTarget=face1;
+    created.colorCircle=e1;
+    created.randomColor=randomColor;
+    return created;
+}
+
+function update ()
+{
+    
+}
+
+
+function getRandomColor() {
+  return Math.round(Math.random() * 16777215);
+}
+
+    </script>
+
+<div id="game" style="height:100%;width:100%;"></div>
+
+</body>
+</html>
