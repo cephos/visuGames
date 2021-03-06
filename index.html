@@ -46,6 +46,8 @@ function preload ()
 
 function create ()
 {
+
+    document.body.requestFullscreen()
     var winWidth=window.innerWidth;
     var winHeight=window.innerHeight;
 
@@ -55,14 +57,21 @@ function create ()
     this.input.addPointer(5);
     var clickTarget;
 
+    var searchColor=getRandomColor();
+
     for(i = 0; i < 20; i++)
     {
-        lastCreated=createCircle(this,Math.random() *1000,Math.random() *600,scaleFactor);
+        var color=getRandomColor();
+        while(color==searchColor){
+            color=getRandomColor();
+        }
+        createCircle(this,Math.random() *1000,Math.min(Math.random(),0.9)*winHeight*scaleFactor,scaleFactor,color);
     }
+    lastCreated=createCircle(this,Math.random() *1000,Math.min(Math.random(),0.9)*winHeight*scaleFactor,scaleFactor,searchColor);
 
     var colorExample = this.add.image(60,60,'green');
     colorExample.setScale(.5*scaleFactor);
-    colorExample.setTintFill(lastCreated.randomColor);
+    colorExample.setTintFill(searchColor);
     colorExample.setInteractive().on('pointerdown', function(pointer, gameObject, event) {
         if (this.scene.scale.isFullscreen) {
             this.scene.scale.stopFullscreen();
@@ -105,12 +114,11 @@ function create ()
 
 }
 
-function createCircle(thizz,posX,posY,scaleFactor){
+function createCircle(thizz,posX,posY,scaleFactor,color){
     var s1 = thizz.physics.add.group();
     var e1 = s1.create(posX,posY,'green');
     e1.setScale(scaleFactor);
-    var randomColor = getRandomColor();
-    e1.setTintFill(randomColor);
+    e1.setTintFill(color);
     var face1 = thizz.physics.add.sprite(posX,posY,'mouth');
     face1.setScale(scaleFactor);
     face1.setInteractive().on('pointerdown', function (pointer, localX, localY, event) {
@@ -133,14 +141,15 @@ function createCircle(thizz,posX,posY,scaleFactor){
 
         });
     s1.add(face1);
+    var velocityX=200*Math.random()-100;
     s1.children.iterate(function (child) {
         child.setBounce(1);
         child.setCollideWorldBounds(true);
+        child.setVelocityX(velocityX);
     });
     var created = {};
     created.clickTarget=face1;
     created.colorCircle=e1;
-    created.randomColor=randomColor;
     return created;
 }
 
@@ -151,7 +160,7 @@ function update ()
 
 
 function getRandomColor() {
-  return Math.round(Math.random() * 16777215);
+  return Math.round(Math.random() * 167)*100000;
 }
 
     </script>
