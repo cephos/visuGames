@@ -13,6 +13,11 @@ class BallEater extends Phaser.Scene {
 
     preload ()
     {
+        this.load.scenePlugin({
+            key: 'rexuiplugin',
+            url: 'libs/rexuiplugin.min.js',
+            sceneKey: 'rexUI'
+        });
         this.load.setPath('assets');
         this.load.image('green',"green.png");
         this.load.spritesheet('eat',"eat.png",{ frameWidth: 234, frameHeight: 234 });
@@ -41,13 +46,14 @@ class BallEater extends Phaser.Scene {
             while(color==searchColor){
                 color=this.getRandomColor();
             }
-            this.createCircle(this,Math.random() *1000,Math.min(Math.random(),0.9)*winHeight*scaleFactor,scaleFactor,color);
+            this.createCircle(this,Math.random() *1000,Math.max(Math.min(Math.random()*winHeight,winHeight-scaleFactor*234/2),scaleFactor*234/2),scaleFactor,color);
         }
         var lastCreated=this.createCircle(this,Math.random() *1000,Math.min(Math.random(),0.9)*winHeight*scaleFactor,scaleFactor,searchColor);
     
 
-        var posX = Math.random() *1000;
-        var posY = Math.min(Math.random(),0.9)*winHeight*scaleFactor;
+        console.log(winWidth-1.5*scaleFactor*234/2);
+        var posX = Math.max(1.5*scaleFactor*234/2,Math.min(Math.random()*winWidth,winWidth-1.5*scaleFactor*234));
+        var posY = Math.max(1.5*scaleFactor*234/2,Math.min(Math.random()*winHeight,winHeight-1.5*scaleFactor*234));
 
         this.colorExample = this.add.image(posX,posY,'green');
         this.colorExample.setScale(1.5*scaleFactor);
@@ -72,14 +78,14 @@ class BallEater extends Phaser.Scene {
     
         this.anims.create({
             key: 'eat',
-            frames: this.anims.generateFrameNumbers('eat', { start: 0, end: 1 }),
+            frames: this.anims.generateFrameNumbers('eat', { start: 1, end: 2 }),
             frameRate: 5,
             repeat: -1
         });
     
         this.anims.create({
             key: 'smile',
-            frames: [ { key: 'eat', frame: 2 } ],
+            frames: [ { key: 'eat', frame: 3 } ],
             frameRate: 20
         });
 
@@ -120,7 +126,38 @@ class BallEater extends Phaser.Scene {
         //var p = this.physics.add.image(0, 0, 'green').setInteractive();
         //p.setBounce(0.8);
         //p.setCollideWorldBounds(true);
+
+        this.createUI();
     
+    }
+
+    createUI(){
+        this.rexUI.add.slider({
+            x: 320,
+            y: 10,
+            width: 200,
+            height: 20,
+            orientation: 'x',
+
+            track: this.rexUI.add.roundRectangle(0, 0, 0, 0, 6, COLOR_DARK),
+            text: this.scene.scene.add.text(320, 2, 'Menu -->'),
+            thumb: this.rexUI.add.roundRectangle(0, 0, 0, 0, 10, COLOR_LIGHT),
+
+            valuechangeCallback: function (newValue, oldValue, slider) {
+                console.log(newValue);
+                if(newValue>0.9){
+                    this.scene.scene.start('Menu');
+                }else{
+                    setTimeout(() => {slider.childrenMap.thumb._x=230;},1500);
+                }
+            },
+            space: {
+                top: 4,
+                bottom: 4
+            },
+            input: 'drag', // 'drag'|'click'
+        })
+            .layout();
     }
     
     createCircle(thizz,posX,posY,scaleFactor,color){
@@ -142,6 +179,6 @@ class BallEater extends Phaser.Scene {
     }
     
     getRandomColor() {
-      return Math.round(Math.random() * 167)*100000;
+      return Math.round(Math.random() * 167)*1000000+1934;
     }
 }

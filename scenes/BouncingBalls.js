@@ -1,3 +1,6 @@
+const COLOR_PRIMARY = 0x4e342e;
+const COLOR_LIGHT = 0x7b5e57;
+const COLOR_DARK = 0x260e04;
 
 class BouncingBalls extends Phaser.Scene {
 
@@ -14,6 +17,11 @@ class BouncingBalls extends Phaser.Scene {
 
     preload ()
     {
+        this.load.scenePlugin({
+            key: 'rexuiplugin',
+            url: 'libs/rexuiplugin.min.js',
+            sceneKey: 'rexUI'
+        });
         this.load.setPath('assets');
         this.load.image('green',"green.png");
         this.load.spritesheet('mouth',"mouth.png",{ frameWidth: 234, frameHeight: 234 });
@@ -88,7 +96,38 @@ class BouncingBalls extends Phaser.Scene {
         //var p = this.physics.add.image(0, 0, 'green').setInteractive();
         //p.setBounce(0.8);
         //p.setCollideWorldBounds(true);
+
+        this.createUI();
     
+    }
+
+    createUI(){
+        this.rexUI.add.slider({
+            x: 320,
+            y: 10,
+            width: 200,
+            height: 20,
+            orientation: 'x',
+
+            track: this.rexUI.add.roundRectangle(0, 0, 0, 0, 6, COLOR_DARK),
+            text: this.scene.scene.add.text(320, 2, 'Menu -->'),
+            thumb: this.rexUI.add.roundRectangle(0, 0, 0, 0, 10, COLOR_LIGHT),
+
+            valuechangeCallback: function (newValue, oldValue, slider) {
+                console.log(newValue);
+                if(newValue>0.9){
+                    this.scene.scene.start('Menu');
+                }else{
+                    setTimeout(() => {slider.childrenMap.thumb._x=230;},1500);
+                }
+            },
+            space: {
+                top: 4,
+                bottom: 4
+            },
+            input: 'drag', // 'drag'|'click'
+        })
+            .layout();
     }
     
     createCircle(thizz,posX,posY,scaleFactor,color){
